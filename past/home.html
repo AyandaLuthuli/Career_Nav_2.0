@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Career Navigator</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  </head>
+  <body>
+    <!-- Landing Section -->
+    <section class="landing" id="landing">
+      <div class="landing-content">
+        <h1>AI Powered Career Navigation</h1>
+        <p>
+          Empowering South African youth with personalized career guidance
+          through AI.
+        </p>
+        <button id="startBtn">Start Chat</button>
+      </div>
+    </section>
+
+    <!-- Chatbot Section -->
+    <section class="chatbot hidden" id="chatbot">
+      <header>
+        <h2>Career Navigator Chatbot</h2>
+      </header>
+
+      <div class="chat-container" id="chat-container">
+        <!-- Chat messages appear here -->
+        <!-- <div class="bot-message">
+          <!-- 👋 Hi there! I'm your AI Career Guide. Let's find your ideal career
+          path. -->
+        </div> 
+      </div>
+
+      <div class="input-area">
+        <input type="text" id="userInput" placeholder="Type your message..." />
+        <button id="sendBtn">Send</button>
+      </div>
+    </section>
+
+    <script src="script.js"></script>
+  </body>
+</html>

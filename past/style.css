@@ -160,3 +160,59 @@ header {
     font-size: 0.9rem;
   }
 }
+/* Add to your existing style.css */
+.action-button {
+  background: linear-gradient(135deg, #00ffd1, #0d9488);
+  color: #000;
+  border: none;
+  padding: 12px 20px;
+  margin: 10px 5px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.action-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 255, 209, 0.4);
+  background: linear-gradient(135deg, #0d9488, #00ffd1);
+  color: white;
+}
+
+.recommendation-item {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 15px;
+  margin: 10px 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.recommendation-item:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateX(5px);
+}
+
+.recommendation-item strong {
+  color: #00ffd1;
+  display: block;
+  margin-bottom: 8px;
+}
+
+/* Update header to include user info */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: rgba(0, 0, 0, 0.8);
+  border-bottom: 2px solid #00ffd1;
+}
+
+.user-info {
+  font-size: 0.9rem;
+  color: #00ffd1;
+}

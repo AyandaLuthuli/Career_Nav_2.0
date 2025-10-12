@@ -3,43 +3,117 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI Career Navigator</title>
+    <title>AI Career Navigator - Login</title>
     <link rel="stylesheet" href="style.css" />
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+      /* === General Page Styling === */
+      body {
+        font-family: "Poppins", sans-serif;
+        background: linear-gradient(135deg, #1a1a40, #0d9488);
+        color: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-image: url("https://plus.unsplash.com/premium_photo-1726729225704-617ac19f2aae?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1525");
+        background-size: cover;
+        background-position: center;
+        backdrop-filter: blur(4px);
+      }
+
+      .container {
+        background: rgba(0, 0, 0, 0.6);
+        padding: 2rem 3rem;
+        border-radius: 15px;
+        width: 100%;
+        max-width: 400px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 1.5rem;
+        font-size: 1.8rem;
+        color: #00ffd1;
+      }
+
+      input {
+        width: 100%;
+        padding: 0.8rem;
+        margin: 0.5rem 0;
+        border: none;
+        border-radius: 8px;
+        outline: none;
+        font-size: 1rem;
+      }
+
+      button {
+        width: 100%;
+        padding: 0.8rem;
+        background-color: #00ffd1;
+        color: #000;
+        font-weight: bold;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.3s;
+        font-size: 1rem;
+      }
+
+      button:hover {
+        background-color: #0d9488;
+        color: #fff;
+      }
+
+      p {
+        text-align: center;
+        margin-top: 1rem;
+        font-size: 0.9rem;
+      }
+
+      a {
+        color: #00ffd1;
+        cursor: pointer;
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+    </style>
   </head>
   <body>
-    <!-- Landing Section -->
-    <section class="landing" id="landing">
-      <div class="landing-content">
-        <h1>AI Powered Career Navigation</h1>
-        <p>
-          Empowering South African youth with personalized career guidance
-          through AI.
-        </p>
-        <button id="startBtn">Start Chat</button>
-      </div>
-    </section>
+    <div class="container">
+      <h1>AI Career Navigator</h1>
 
-    <!-- Chatbot Section -->
-    <section class="chatbot hidden" id="chatbot">
-      <header>
-        <h2>Career Navigator Chatbot</h2>
-      </header>
-
-      <div class="chat-container" id="chat-container">
-        <!-- Chat messages appear here -->
-        <!-- <div class="bot-message">
-          <!-- 👋 Hi there! I'm your AI Career Guide. Let's find your ideal career
-          path. -->
-        </div> 
+      <div id="loginForm">
+        <h2>Login</h2>
+        <input
+          type="text"
+          id="loginUsername"
+          placeholder="Enter your username"
+          required
+        />
+        <button id="loginBtn">Login</button>
+        <p>Don’t have an account? <a id="showSignup">Sign up</a></p>
       </div>
 
-      <div class="input-area">
-        <input type="text" id="userInput" placeholder="Type your message..." />
-        <button id="sendBtn">Send</button>
+      <div id="signupForm" style="display: none">
+        <h2>Sign Up</h2>
+        <input
+          type="text"
+          id="signupUsername"
+          placeholder="Choose a username"
+          required
+        />
+        <button id="signupBtn">Create Account</button>
+        <p>Already have an account? <a id="showLogin">Login</a></p>
       </div>
-    </section>
+    </div>
 
-    <script src="script.js"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js"></script>
+    <script src="login.js"></script>
   </body>
 </html>

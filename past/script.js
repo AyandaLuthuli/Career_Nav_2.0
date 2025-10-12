@@ -49,6 +49,8 @@ const chatContainer = document.getElementById("chat-container");
 // === CHAT STATE ===
 let step = 0;
 let userData = { name: "", education: "", skills: "", interests: "" };
+let currentUser = null;
+let currentSessionId = null;
 
 // === INPUT CLEANING FUNCTION ===
 function cleanUserInput(input, step) {
@@ -61,7 +63,7 @@ function cleanUserInput(input, step) {
           /^(my name is|i'm|i am|you can call me|it's|this is|name's|i go by)/gi,
           ""
         )
-        .replace(/[^\sa-zA-ZÀ-ÿ-']/g, "") // Keep letters, spaces, hyphens, apostrophes
+        .replace(/[^\sa-zA-ZÀ-ÿ-']/g, "")
         .trim()
         .split(" ")
         .map((word) => {
@@ -71,7 +73,7 @@ function cleanUserInput(input, step) {
           return word;
         })
         .join(" ")
-        .replace(/\s+/g, " "); // Clean extra spaces
+        .replace(/\s+/g, " ");
 
     case 1: // Education - clean but preserve educational terms
       return clean
@@ -94,52 +96,161 @@ function cleanUserInput(input, step) {
 }
 
 // === FUNCTIONS ===
-function appendMessage(sender, text) {
+function appendMessage(sender, text, isHTML = false) {
   const msg = document.createElement("div");
   msg.classList.add(sender === "user" ? "user-message" : "bot-message");
-  msg.textContent = text;
+
+  if (isHTML) {
+    msg.innerHTML = text;
+  } else {
+    msg.textContent = text;
+  }
+
   chatContainer.appendChild(msg);
   chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
-// === Check for saved user on load ===
-// window.addEventListener("load", async () => {
-//   const savedUserId = localStorage.getItem("career_user_id");
-//   if (savedUserId) {
-//     const { data } = await supabase
-//       .from("users")
-//       .select("*")
-//       .eq("id", savedUserId)
-//       .single();
+function addActionButton(text, onClick) {
+  const button = document.createElement("button");
+  button.textContent = text;
+  button.classList.add("action-button");
+  button.addEventListener("click", onClick);
+  chatContainer.appendChild(button);
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+}
 
-//     if (data) {
-//       landing.classList.add("hidden");
-//       chatbot.classList.remove("hidden");
-//       appendMessage(
-//         "bot",
-//         `👋 Welcome back, ${data.full_name}! Would you like to explore new careers or view your past suggestions?`
-//       );
-//       // Pre-fill user data for returning users
-//       userData = {
-//         name: data.full_name,
-//         education: data.education_level,
-//         skills: data.skills,
-//         interests: data.interests,
-//       };
-//       step = 4; // Move to completed state
-//     }
-//   }
-// });
+function clearChat() {
+  chatContainer.innerHTML = "";
+}
 
-// === CHAT FLOW ===
-startBtn.addEventListener("click", () => {
+// === LOAD USER DATA AND PREVIOUS CONVERSATIONS ===
+window.addEventListener("load", async () => {
+  const savedUserId = localStorage.getItem("career_user_id");
+
+  if (!savedUserId) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  try {
+    // Get user data
+    const { data: user, error: userError } = await supabase
+      .from("users")
+      .select("*")
+      .eq("id", savedUserId)
+      .single();
+
+    if (userError || !user) {
+      window.location.href = "index.html";
+      return;
+    }
+
+    currentUser = user;
+
+    // Get previous recommendations
+    const { data: previousRecs, error: recError } = await supabase
+      .from("recommendations")
+      .select("*")
+      .eq("user_id", savedUserId)
+      .order("created_at", { ascending: false })
+      .limit(5);
+
+    // Show welcome with options
+    landing.classList.remove("hidden");
+    appendMessage("bot", `👋 Welcome back, ${user.full_name || "there"}!`);
+
+    if (previousRecs && previousRecs.length > 0) {
+      appendMessage(
+        "bot",
+        "I found your previous career conversations. What would you like to do?"
+      );
+
+      // Show last recommendation summary
+      const lastRec = previousRecs[0];
+      const preview = lastRec.reasoning.substring(0, 150) + "...";
+      appendMessage("bot", `📚 Last session: ${preview}`);
+
+      addActionButton("🔄 Continue Previous Conversation", () =>
+        loadPreviousConversation(previousRecs[0])
+      );
+      addActionButton("➕ Start New Career Conversation", startNewConversation);
+      addActionButton("📊 View All Previous Recommendations", () =>
+        showAllRecommendations(previousRecs)
+      );
+    } else {
+      appendMessage("bot", "Ready to discover your ideal career path!");
+      addActionButton("🚀 Start Career Assessment", startNewConversation);
+    }
+  } catch (error) {
+    console.error("Error loading user:", error);
+    window.location.href = "index.html";
+  }
+});
+
+function loadPreviousConversation(recommendation) {
+  clearChat();
   landing.classList.add("hidden");
   chatbot.classList.remove("hidden");
+
+  appendMessage("bot", `🔍 Loading your previous career conversation...`, true);
+  appendMessage("bot", recommendation.reasoning, true);
+
+  // Set up for follow-up questions
+  step = 4;
+  userData = {
+    name: currentUser.full_name || "",
+    education: currentUser.education_level || "",
+    skills: currentUser.skills || "",
+    interests: currentUser.interests || "",
+  };
+
+  appendMessage(
+    "bot",
+    "What would you like to explore next? You can ask about specific careers, skills development, or anything else!"
+  );
+}
+
+function showAllRecommendations(recommendations) {
+  clearChat();
+  appendMessage("bot", "📊 Your Career Recommendation History:", true);
+
+  recommendations.forEach((rec, index) => {
+    const date = new Date(rec.created_at).toLocaleDateString();
+    const preview = rec.reasoning.substring(0, 200) + "...";
+
+    const recElement = document.createElement("div");
+    recElement.classList.add("recommendation-item");
+    recElement.innerHTML = `
+      <strong>Session ${recommendations.length - index} (${date})</strong><br>
+      ${preview}
+    `;
+
+    recElement.addEventListener("click", () => loadPreviousConversation(rec));
+    chatContainer.appendChild(recElement);
+  });
+
+  addActionButton("🔄 Start New Conversation", startNewConversation);
+}
+
+function startNewConversation() {
+  clearChat();
+  landing.classList.add("hidden");
+  chatbot.classList.remove("hidden");
+
+  // Reset state for new conversation
+  step = 0;
+  userData = { name: "", education: "", skills: "", interests: "" };
+  currentSessionId = Date.now().toString(); // Generate unique session ID
+
+  appendMessage("bot", "🚀 Starting new career assessment...");
   appendMessage(
     "bot",
     "👋 Hi there! I'm your AI Career Guide. What's your name?"
   );
-});
+}
+
+// === CHAT FLOW ===
+startBtn.addEventListener("click", startNewConversation);
 
 sendBtn.addEventListener("click", handleSend);
 userInput.addEventListener("keypress", (e) => {
@@ -156,6 +267,12 @@ async function handleSend() {
 }
 
 async function handleConversation(input) {
+  // For follow-up questions after step 4, use Gemini directly
+  if (step >= 4) {
+    await handleFollowUpQuestion(input);
+    return;
+  }
+
   // Clean the input based on current step
   const cleanedInput = cleanUserInput(input, step);
   console.log(
@@ -200,47 +317,33 @@ async function handleConversation(input) {
       );
       step++;
 
-      // === Save user data to Supabase ===
-      const { data, error } = await supabase
+      // Update user profile in database
+      const { error: updateError } = await supabase
         .from("users")
-        .insert([
-          {
-            full_name: userData.name,
-            education_level: userData.education,
-            skills: userData.skills,
-            interests: userData.interests,
-          },
-        ])
-        .select();
+        .update({
+          full_name: userData.name,
+          education_level: userData.education,
+          skills: userData.skills,
+          interests: userData.interests,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", currentUser.id);
 
-      if (error) {
-        console.error("Error saving user:", error);
-        appendMessage(
-          "bot",
-          "⚠️ Could not save your info. Please try again later."
-        );
-        return;
+      if (updateError) {
+        console.error("Error updating user:", updateError);
       }
 
-      const newUser = data[0];
-      localStorage.setItem("career_user_id", newUser.id);
-
       // === Call Gemini for career advice ===
-      await showCareerSuggestions(newUser.id);
+      await showCareerSuggestions(currentUser.id);
       break;
+  }
+}
 
-    default:
-      // Handle additional conversation after recommendations
-      appendMessage(
-        "bot",
-        "If you'd like to restart with a new profile, refresh the page. Or ask me anything else about careers!"
-      );
+async function handleFollowUpQuestion(input) {
+  appendMessage("bot", "🤔 Thinking...");
 
-      // Optional: Handle follow-up questions with Gemini
-      if (input.length > 5) {
-        const followUpPrompt = `
-The user is asking a follow-up question after receiving career recommendations. 
-Their profile:
+  const followUpPrompt = `
+The user is asking a follow-up question about careers. Here is their profile:
 - Name: ${userData.name}
 - Education: ${userData.education}
 - Skills: ${userData.skills}
@@ -248,13 +351,15 @@ Their profile:
 
 User's question: "${input}"
 
-Provide a helpful, concise response about careers or their career path.
+Provide a helpful, concise response about careers, skills development, or their career path in South Africa.
+Keep it practical and motivational.
 `;
-        appendMessage("bot", "🤔 Thinking about your question...");
-        const aiResponse = await askGemini(followUpPrompt);
-        appendMessage("bot", aiResponse);
-      }
-  }
+
+  const aiResponse = await askGemini(followUpPrompt);
+
+  // Remove "Thinking..." message and show actual response
+  chatContainer.removeChild(chatContainer.lastChild);
+  appendMessage("bot", aiResponse, true);
 }
 
 // === CAREER RECOMMENDATION (via Gemini) ===
@@ -286,13 +391,13 @@ Keep the response short, friendly, and motivational. Focus on opportunities avai
 
   const aiResponse = await askGemini(prompt);
 
-  // --- Format Gemini's response for cleaner display ---
+  // Format Gemini's response for cleaner display
   const formattedResponse = aiResponse
-    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>") // handle bold text
-    .replace(/\n/g, "<br>") // handle line breaks
-    .replace(/\d\./g, "🔹"); // replace "1.", "2.", "3." with bullets
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\n/g, "<br>")
+    .replace(/\d\./g, "🔹");
 
-  // --- Create message container with HTML ---
+  // Create message container with HTML
   const msg = document.createElement("div");
   msg.classList.add("bot-message");
   msg.innerHTML = `
@@ -310,8 +415,13 @@ Keep the response short, friendly, and motivational. Focus on opportunities avai
       user_id: userId,
       suggested_career: "Gemini AI Career Recommendations",
       reasoning: aiResponse,
+      session_id: currentSessionId,
     },
   ]);
+
+  // Add action buttons after recommendations
+  addActionButton("🔄 Start New Assessment", startNewConversation);
+  addActionButton("📚 View Previous Sessions", () => window.location.reload());
 }
 
 // === INPUT VALIDATION ===
