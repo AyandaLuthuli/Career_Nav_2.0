@@ -1,71 +1,73 @@
-# Career_Nav_2.0
-AI Career Navigator 🤖
-A web application that helps South African youth discover ideal career paths through AI-powered conversations.
+# 🎓 Career_Nav_2.0 — AI Career Navigator 🤖
 
-🚀 Features
-User Authentication - Simple username-based login/signup
+A web application designed to help **South African youth** discover their ideal career paths through **AI-powered conversations**.
 
-AI Career Guidance - Get personalized career recommendations using Google Gemini AI
+---
 
-Conversation History - Save and revisit previous career sessions
+## 🚀 Features
 
-Mobile Responsive - Works perfectly on all devices
+- 🔐 **User Authentication** – Simple username-based login/signup  
+- 🧠 **AI Career Guidance** – Get personalized career recommendations powered by **Google Gemini AI**  
+- 💬 **Conversation History** – Save and revisit previous career sessions  
+- 📱 **Mobile Responsive** – Works perfectly on all devices  
+- ⚡ **Real-time Chat** – Interactive, dynamic conversation flow  
 
-Real-time Chat - Interactive conversation flow
+---
 
-🛠 Tech Stack
-Frontend: HTML5, CSS3, JavaScript
+## 🛠 Tech Stack
 
-Backend: Supabase (PostgreSQL)
+| Layer | Technology |
+|-------|-------------|
+| **Frontend** | HTML5, CSS3, JavaScript |
+| **Backend** | Supabase (PostgreSQL) |
+| **AI Integration** | Google Gemini API |
+| **Hosting** | Static file hosting (Netlify / Vercel) |
 
-AI: Google Gemini API
+---
 
-Hosting: Static file hosting 
+## 🎯 How It Works
 
-🎯 How It Works
-User signs up/login with username
+1. 👤 **User signs up/logs in** using a simple username  
+2. 💬 **Complete the AI career assessment** through chat, covering:  
+   - Personal information  
+   - Education background  
+   - Skills and talents  
+   - Career interests  
+3. 🎓 **Receive AI-powered recommendations** – 3 tailored career paths  
+4. 💾 **Save & revisit** conversations anytime  
 
-Complete career assessment through chat:
+---
 
-Personal information
+## 📱 Responsive Design
 
-Education background
+- 🪟 **Mobile-first layout**  
+- 💎 **Glassmorphism-inspired UI**  
+- 🎞️ **Smooth animations and transitions**  
+- 🤳 **Touch-friendly interface**  
 
-Skills and talents
+---
 
-Career interests
+## 🔄 Key Improvements (v2.0)
 
-Get AI-powered recommendations - 3 tailored career paths
+| Old Version | Career_Nav_2.0 |
+|--------------|----------------|
+| ❌ Anonymous sessions | ✅ User authentication |
+| ❌ Single sessions only | ✅ Conversation history |
+| ❌ Unreliable AI parsing | ✅ Structured data collection |
+| ❌ Desktop-only | ✅ Mobile responsive |
+| ❌ Unstructured data flow | ✅ Organized Supabase integration |
 
-Save & revisit conversations anytime
+---
 
-📱 Responsive Design
-Mobile-first approach
+## 🌟 Highlights
 
-Glass morphism UI design
+- 🚫 **No passwords needed** – Simple username authentication  
+- 💾 **Local storage** – Works offline & retains user data  
+- 🇿🇦 **South Africa–focused** – Localized career recommendations  
+- 🤖 **AI-powered** – Smart, context-aware career matching with Gemini  
 
-Smooth animations and transitions
+---
 
-Touch-friendly interface
-
-🔄 Key Improvements
-✅ Reliable data collection (vs previous AI parsing errors)
-
-✅ User authentication (vs anonymous sessions)
-
-✅ Conversation history (vs single sessions)
-
-✅ Mobile responsive (vs desktop-only)
-
-✅ Structured data flow (vs unreliable AI extraction)
-
-🌟 Highlights
-No passwords needed - Simple username authentication
-
-Local storage - Works offline and persists data
-
-South Africa focused - Local career recommendations
-
-AI-powered - Smart career matching using Gemini
-
-📄 License
+### 💡 Author
+**Career_Nav_2.0** by *Ayanda Alton*  
+Built with ❤️ to empower the next generation of South African.
