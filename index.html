@@ -4,112 +4,300 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AI Career Navigator - Login</title>
-    <link rel="stylesheet" href="style.css" />
-
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
-      /* === General Page Styling === */
+      /* === CSS Reset === */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      /* === General Styles === */
       body {
         font-family: "Poppins", sans-serif;
-        background: linear-gradient(135deg, #1a1a40, #0d9488);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: #fff;
+        min-height: 100vh;
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100vh;
-        margin: 0;
-        background-image: url("https://plus.unsplash.com/premium_photo-1726729225704-617ac19f2aae?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1525");
+        padding: 20px;
+        line-height: 1.6;
+        background-image: url("https://plus.unsplash.com/premium_photo-1682308235777-2bf9556b933b?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1988");
         background-size: cover;
         background-position: center;
         backdrop-filter: blur(4px);
       }
 
-      .container {
-        background: rgba(0, 0, 0, 0.6);
-        padding: 2rem 3rem;
-        border-radius: 15px;
+      /* === Background Animation === */
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
         width: 100%;
-        max-width: 400px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        height: 100%;
+        background: radial-gradient(
+            circle at 20% 80%,
+            rgba(120, 119, 198, 0.3) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 20%,
+            rgba(255, 119, 198, 0.3) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 40% 40%,
+            rgba(120, 219, 255, 0.2) 0%,
+            transparent 50%
+          );
+        z-index: -1;
       }
 
+      /* === Container === */
+      .container {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 2.5rem;
+        width: 100%;
+        max-width: 420px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1),
+          0 0 0 1px rgba(255, 255, 255, 0.1);
+        animation: fadeInUp 0.8s ease-out;
+      }
+
+      /* === Typography === */
       h1 {
         text-align: center;
+        margin-bottom: 0.5rem;
+        font-size: 2rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #00ffd1, #00b8ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      h2 {
+        text-align: center;
         margin-bottom: 1.5rem;
-        font-size: 1.8rem;
-        color: #00ffd1;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #fff;
+      }
+
+      .subtitle {
+        text-align: center;
+        margin-bottom: 2rem;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.95rem;
+      }
+
+      /* === Form Elements === */
+      .form-group {
+        margin-bottom: 1.5rem;
       }
 
       input {
         width: 100%;
-        padding: 0.8rem;
-        margin: 0.5rem 0;
+        padding: 1rem 1.2rem;
         border: none;
-        border-radius: 8px;
-        outline: none;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        color: #fff;
         font-size: 1rem;
+        font-family: "Poppins", sans-serif;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
       }
 
+      input::placeholder {
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      input:focus {
+        outline: none;
+        background: rgba(255, 255, 255, 0.2);
+        border-color: #00ffd1;
+        box-shadow: 0 0 0 3px rgba(0, 255, 209, 0.2);
+        transform: translateY(-2px);
+      }
+
+      /* === Buttons === */
       button {
         width: 100%;
-        padding: 0.8rem;
-        background-color: #00ffd1;
-        color: #000;
-        font-weight: bold;
+        padding: 1rem 1.2rem;
         border: none;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: 0.3s;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #00ffd1, #00b8ff);
+        color: #1a1a2e;
         font-size: 1rem;
+        font-weight: 600;
+        font-family: "Poppins", sans-serif;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 1rem;
       }
 
       button:hover {
-        background-color: #0d9488;
-        color: #fff;
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0, 255, 209, 0.3),
+          0 0 0 1px rgba(255, 255, 255, 0.1);
       }
 
+      button:active {
+        transform: translateY(-1px);
+      }
+
+      /* === Links === */
       p {
         text-align: center;
-        margin-top: 1rem;
+        margin-top: 1.5rem;
         font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.8);
       }
 
       a {
         color: #00ffd1;
-        cursor: pointer;
         text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        cursor: pointer;
       }
 
       a:hover {
+        color: #00b8ff;
         text-decoration: underline;
+      }
+
+      /* === Form Transitions === */
+      #loginForm,
+      #signupForm {
+        transition: all 0.4s ease-in-out;
+      }
+
+      /* === Animations === */
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* === Mobile Responsive === */
+      @media (max-width: 480px) {
+        body {
+          padding: 15px;
+        }
+
+        .container {
+          padding: 2rem 1.5rem;
+          border-radius: 16px;
+        }
+
+        h1 {
+          font-size: 1.75rem;
+        }
+
+        h2 {
+          font-size: 1.3rem;
+        }
+
+        input,
+        button {
+          padding: 0.9rem 1.1rem;
+        }
+
+        .subtitle {
+          font-size: 0.9rem;
+        }
+      }
+
+      @media (max-width: 360px) {
+        .container {
+          padding: 1.5rem 1.2rem;
+        }
+
+        h1 {
+          font-size: 1.5rem;
+        }
+
+        h2 {
+          font-size: 1.2rem;
+        }
+      }
+
+      /* === Loading State === */
+      .loading {
+        opacity: 0.7;
+        pointer-events: none;
+      }
+
+      /* === Error/Success Messages === */
+      .alert {
+        padding: 0.8rem 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+        text-align: center;
+      }
+
+      .alert-error {
+        background: rgba(255, 71, 87, 0.2);
+        border: 1px solid rgba(255, 71, 87, 0.4);
+        color: #ff9aa2;
+      }
+
+      .alert-success {
+        background: rgba(0, 255, 209, 0.2);
+        border: 1px solid rgba(0, 255, 209, 0.4);
+        color: #00ffd1;
       }
     </style>
   </head>
   <body>
     <div class="container">
       <h1>AI Career Navigator</h1>
+      <p class="subtitle">Discover your ideal career path with AI</p>
 
       <div id="loginForm">
-        <h2>Login</h2>
-        <input
-          type="text"
-          id="loginUsername"
-          placeholder="Enter your username"
-          required
-        />
-        <button id="loginBtn">Login</button>
-        <p>Don’t have an account? <a id="showSignup">Sign up</a></p>
+        <h2>Welcome Back</h2>
+        <div class="form-group">
+          <input
+            type="text"
+            id="loginUsername"
+            placeholder="Enter your username"
+            required
+          />
+        </div>
+        <button id="loginBtn">Sign In</button>
+        <p>New here? <a id="showSignup">Create an account</a></p>
       </div>
 
       <div id="signupForm" style="display: none">
-        <h2>Sign Up</h2>
-        <input
-          type="text"
-          id="signupUsername"
-          placeholder="Choose a username"
-          required
-        />
+        <h2>Join Us</h2>
+        <div class="form-group">
+          <input
+            type="text"
+            id="signupUsername"
+            placeholder="Choose a username"
+            required
+          />
+        </div>
         <button id="signupBtn">Create Account</button>
-        <p>Already have an account? <a id="showLogin">Login</a></p>
+        <p>Already have an account? <a id="showLogin">Sign in</a></p>
       </div>
     </div>
 
