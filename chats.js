@@ -522,7 +522,10 @@ async function showCareerSuggestions() {
   const prompt = `
 You are an AI Career Advisor helping South African youth discover their ideal career paths.
 
-Based on the following profile, suggest *exactly three* realistic and in-demand careers in South Africa.
+Based on the following profile, suggest *exactly three* realistic opportunities available in South Africa.
+Consider current high-demand sectors in SA:
+
+
 For each career, include:
 1️⃣ The career title
 2️⃣ A one-sentence explanation of why it's a good fit
