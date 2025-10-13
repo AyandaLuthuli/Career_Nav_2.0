@@ -520,21 +520,30 @@ async function showCareerSuggestions() {
   const { education, skills, interests, name } = userData;
 
   const prompt = `
-You are an AI Career Advisor helping South African youth discover their ideal career paths.
+You are an AI Career Advisor specifically focused on South African youth and the local job market.
 
-Based on the following profile, suggest *exactly three* realistic opportunities available in South Africa.
-Consider current high-demand sectors in SA:
+Based on the following profile, suggest *exactly three* realistic and in-demand opportunities in South Africa.
 
+CRITICAL: Focus on these high-growth sectors in South Africa:
+• Digital Technology & IT - software development, data analysis, cybersecurity, digital marketing
+• Green Economy - renewable energy, environmental management, sustainable agriculture
+• Healthcare & Social Services - nursing, community health, mental health support
+• Financial Services - fintech, banking, insurance, financial planning
+• Creative Industries - digital content creation, graphic design, video production
+• Business Process Outsourcing - call center management, customer service
+• Tourism & Hospitality - eco-tourism, hotel management, event planning
+• Manufacturing & Logistics - supply chain management, quality control
 
-For each career, include:
-1️⃣ The career title
-2️⃣ A one-sentence explanation of why it's a good fit
-3️⃣ Mention key matching skills or relevant industries
+For each opportunity, include:
+1️⃣ The career/job title (must be realistic for SA market)
+2️⃣ A one-sentence explanation of why it's a good fit for THIS user
+3️⃣ Mention key matching skills AND the specific SA industry sector
 
 Format your answer clearly like this:
 
-1. Career Title — short explanation  
-   Skills/Industry: ...
+1. Career Title — short explanation focusing on SA opportunities  
+   Skills Match: [specific skills from profile that match]  
+   SA Industry: [specific SA sector from above list]
 
 Profile:
 Name: ${name}
@@ -542,7 +551,7 @@ Education: ${education}
 Skills: ${skills}
 Interests: ${interests}
 
-Keep the response short, friendly, and motivational. Focus on opportunities available in South Africa.
+Keep the response practical, motivational, and SPECIFIC to South Africa. Mention real SA companies or sectors where possible.
 `;
 
   const aiResponse = await askGemini(prompt);
@@ -557,17 +566,34 @@ Keep the response short, friendly, and motivational. Focus on opportunities avai
   const msg = document.createElement("div");
   msg.classList.add("bot-message");
   msg.innerHTML = `
-    <strong>🎉 Career Recommendations for ${name}:</strong><br><br>
+    <strong>🎉 South African Career Opportunities for ${name}:</strong><br><br>
     ${formattedResponse}
     <br><br>
-    <em>💡 Remember: These are suggestions based on your profile. Research each option to find your perfect fit!</em>
+    <div style="background: rgba(0, 255, 209, 0.1); padding: 12px; border-radius: 8px; border-left: 4px solid #00ffd1;">
+      <strong>🇿🇦 Next Steps for You:</strong><br>
+      • Explore learnerships on SAYouth.mobi<br>
+      • Check SETA opportunities in your province<br>
+      • Visit your local Youth Employment Service (YES) centre<br>
+      • Research TVET colleges for practical skills
+    </div>
+    <br>
+    <em>💡 These suggestions are based on current South African market trends. Always research each option thoroughly!</em>
   `;
   chatContainer.appendChild(msg);
 
   // Save recommendations to Supabase
   await saveRecommendationToSupabase(aiResponse);
 
-  // Add action buttons
+  // Add SA-specific resources
+  addActionButton("📱 Explore SA Youth ", () =>
+    window.open("https://sayouth.co.za/", "_blank")
+  );
+  addActionButton("🎓 Find TVET Colleges", () =>
+    window.open(
+      "https://nationalgovernment.co.za/units/type/9/tvet-college",
+      "_blank"
+    )
+  );
   addActionButton("🔄 Start New Assessment", () => window.location.reload());
   addActionButton("🏠 Back to Home", () => {
     welcomeSection.classList.remove("hidden");
