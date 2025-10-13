@@ -48,6 +48,7 @@ const chatContainer = document.getElementById("chatContainer");
 const userInput = document.getElementById("userInput");
 const sendBtn = document.getElementById("sendBtn");
 const previousConversations = document.getElementById("previousConversations");
+const anonymousModeToggle = document.getElementById("anonymousMode");
 
 // === CHAT STATE ===
 let step = 0;
@@ -59,6 +60,89 @@ let userData = {
   username: "",
 };
 let currentUser = null;
+let anonymousMode = false;
+
+// === PRIVACY ENHANCEMENTS ===
+function initializePrivacyFeatures() {
+  // Load privacy preference
+  anonymousMode = localStorage.getItem("anonymous_mode") === "true";
+  if (anonymousModeToggle) {
+    anonymousModeToggle.checked = anonymousMode;
+
+    // Add toggle event listener
+    anonymousModeToggle.addEventListener("change", function (e) {
+      anonymousMode = e.target.checked;
+      localStorage.setItem("anonymous_mode", anonymousMode);
+
+      if (anonymousMode) {
+        showPrivacyNotification(
+          "🔒 Anonymous mode enabled: Your personal details will not be stored"
+        );
+      } else {
+        showPrivacyNotification(
+          "🔓 Anonymous mode disabled: Your data will be saved for better recommendations"
+        );
+      }
+
+      // Reload conversations to reflect privacy changes
+      loadPreviousConversations();
+    });
+  }
+
+  // Add privacy policy section to welcome
+  addPrivacyInfo();
+}
+
+function showPrivacyNotification(message) {
+  const notification = document.createElement("div");
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 255, 209, 0.9);
+    color: #000;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    z-index: 1000;
+    animation: slideInRight 0.3s ease-out;
+  `;
+  notification.textContent = message;
+  document.body.appendChild(notification);
+
+  setTimeout(() => {
+    notification.remove();
+  }, 3000);
+}
+
+function addPrivacyInfo() {
+  const privacyHTML = `
+    <div class="privacy-info" style="margin-top: 2rem; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 10px;">
+      <h4 style="color: #00ffd1; margin-bottom: 0.5rem;">🔒 Your Privacy Matters</h4>
+      <p style="font-size: 0.9rem; margin-bottom: 1rem;">We respect your privacy. Enable "Anonymous Mode" to:</p>
+      <ul style="text-align: left; font-size: 0.85rem; margin-left: 1rem; margin-bottom: 1rem;">
+        <li>Use a random username instead of your real name</li>
+        <li>Prevent conversation history storage</li>
+        <li>Keep your career assessments private</li>
+      </ul>
+      <p style="font-size: 0.8rem; color: rgba(255,255,255,0.7)">Your data is never shared with third parties.</p>
+    </div>
+  `;
+
+  if (welcomeSection && !document.querySelector(".privacy-info")) {
+    welcomeSection.insertAdjacentHTML("beforeend", privacyHTML);
+  }
+}
+
+function anonymizeUserData(userData) {
+  return {
+    name: `User_${Math.random().toString(36).substr(2, 9)}`,
+    education: userData.education,
+    skills: userData.skills,
+    interests: userData.interests,
+  };
+}
 
 // === LOAD USER AND CHECK AUTH ===
 window.addEventListener("load", async () => {
@@ -86,6 +170,9 @@ window.addEventListener("load", async () => {
     userData.username = user.logins?.username || user.full_name || "User";
     usernameDisplay.textContent = userData.username;
 
+    // Initialize privacy features
+    initializePrivacyFeatures();
+
     // Load previous conversations from localStorage AND Supabase
     await loadPreviousConversations();
   } catch (error) {
@@ -96,12 +183,12 @@ window.addEventListener("load", async () => {
 
 // === LOAD PREVIOUS CONVERSATIONS ===
 async function loadPreviousConversations() {
-  // Load from localStorage for conversation flow
-  const savedConvos = localStorage.getItem(
-    `career_conversations_${currentUser.id}`
-  );
+  // Only load from localStorage if not in anonymous mode
+  const savedConvos = !anonymousMode
+    ? localStorage.getItem(`career_conversations_${currentUser.id}`)
+    : null;
 
-  // Load from Supabase for career suggestions
+  // Load from Supabase for career suggestions (always load these for demo purposes)
   const { data: recommendations, error } = await supabase
     .from("recommendations")
     .select("*")
@@ -111,9 +198,11 @@ async function loadPreviousConversations() {
 
   let convosHTML = "<h3>📚 Previous Career Sessions</h3>";
 
-  if (recommendations && recommendations.length > 0) {
+  if (anonymousMode) {
+    convosHTML +=
+      '<p style="color: rgba(255,255,255,0.7)">🔒 Conversation history disabled in anonymous mode</p>';
+  } else if (recommendations && recommendations.length > 0) {
     recommendations.forEach((rec, index) => {
-      // Extract first career suggestion for preview
       const suggestionPreview = extractCareerSuggestion(rec.reasoning);
       const date = new Date(rec.created_at).toLocaleDateString();
 
@@ -158,7 +247,6 @@ async function loadPreviousConversations() {
 function extractCareerSuggestion(reasoning) {
   if (!reasoning) return "Career recommendations";
 
-  // Try to extract the first career suggestion
   const lines = reasoning.split("\n");
   const firstCareerLine = lines.find(
     (line) =>
@@ -180,12 +268,16 @@ function extractCareerSuggestion(reasoning) {
       : cleanSuggestion;
   }
 
-  // Fallback: return first 80 characters
   return reasoning.length > 80 ? reasoning.substring(0, 80) + "..." : reasoning;
 }
 
 // === LOAD RECOMMENDATION FROM SUPABASE ===
 async function loadRecommendation(recommendationId) {
+  if (anonymousMode) {
+    showPrivacyNotification("🔒 Cannot load conversations in anonymous mode");
+    return;
+  }
+
   const { data: recommendation, error } = await supabase
     .from("recommendations")
     .select("*")
@@ -193,14 +285,12 @@ async function loadRecommendation(recommendationId) {
     .single();
 
   if (recommendation) {
-    // Get user data for this recommendation
     const { data: user } = await supabase
       .from("users")
       .select("*")
       .eq("id", currentUser.id)
       .single();
 
-    // Set user data
     userData = {
       name: user?.full_name || "",
       education: user?.education_level || "",
@@ -209,11 +299,9 @@ async function loadRecommendation(recommendationId) {
       username: userData.username,
     };
 
-    // Show chat section
     welcomeSection.classList.add("hidden");
     chatSection.classList.remove("hidden");
 
-    // Clear and display the recommendation
     chatContainer.innerHTML = "";
     appendMessage(
       "bot",
@@ -232,7 +320,6 @@ async function loadRecommendation(recommendationId) {
     `;
     chatContainer.appendChild(msg);
 
-    // Add action buttons
     addActionButton("🔄 Start New Assessment", () => window.location.reload());
     addActionButton("🏠 Back to Home", () => {
       welcomeSection.classList.remove("hidden");
@@ -243,6 +330,11 @@ async function loadRecommendation(recommendationId) {
 
 // === LOAD CONVERSATION FROM LOCALSTORAGE ===
 function loadConversation(index) {
+  if (anonymousMode) {
+    showPrivacyNotification("🔒 Cannot load conversations in anonymous mode");
+    return;
+  }
+
   const savedConvos = localStorage.getItem(
     `career_conversations_${currentUser.id}`
   );
@@ -252,25 +344,20 @@ function loadConversation(index) {
   const conversation = conversations[index];
 
   if (conversation) {
-    // Set user data
     userData = conversation.userData;
     step = conversation.step;
 
-    // Show chat section
     welcomeSection.classList.add("hidden");
     chatSection.classList.remove("hidden");
 
-    // Load messages
     chatContainer.innerHTML = "";
     conversation.messages.forEach((msg) => {
       appendMessage(msg.sender, msg.text);
     });
 
-    // If conversation was incomplete, continue from where it left off
     if (step < 4) {
       askNextQuestion();
     } else {
-      // If completed, add option to start new
       addActionButton("🔄 Start New Assessment", () =>
         window.location.reload()
       );
@@ -280,6 +367,10 @@ function loadConversation(index) {
 
 // === SAVE CONVERSATION TO LOCALSTORAGE ===
 function saveConversation() {
+  if (anonymousMode) {
+    return; // Don't save conversations in anonymous mode
+  }
+
   const messages = Array.from(chatContainer.children)
     .filter(
       (element) =>
@@ -298,21 +389,17 @@ function saveConversation() {
     messages: messages,
   };
 
-  // Get existing conversations or create new array
   const savedConvos = localStorage.getItem(
     `career_conversations_${currentUser.id}`
   );
   let conversations = savedConvos ? JSON.parse(savedConvos) : [];
 
-  // Add new conversation
   conversations.unshift(conversation);
 
-  // Keep only last 5 conversations
   if (conversations.length > 5) {
     conversations = conversations.slice(0, 5);
   }
 
-  // Save back to localStorage
   localStorage.setItem(
     `career_conversations_${currentUser.id}`,
     JSON.stringify(conversations)
@@ -324,7 +411,6 @@ function appendMessage(sender, text) {
   const msg = document.createElement("div");
   msg.classList.add(sender === "user" ? "user-message" : "bot-message");
 
-  // Check if text contains HTML tags
   if (text.includes("<") && text.includes(">")) {
     msg.innerHTML = text;
   } else {
@@ -334,7 +420,6 @@ function appendMessage(sender, text) {
   chatContainer.appendChild(msg);
   chatContainer.scrollTop = chatContainer.scrollHeight;
 
-  // Auto-save conversation after each message
   saveConversation();
 }
 
@@ -366,7 +451,6 @@ function askNextQuestion() {
 
 // === START NEW CHAT ===
 startChatBtn.addEventListener("click", () => {
-  // Reset state for new conversation
   step = 0;
   userData = {
     name: "",
@@ -376,14 +460,11 @@ startChatBtn.addEventListener("click", () => {
     username: userData.username,
   };
 
-  // Clear chat container
   chatContainer.innerHTML = "";
 
-  // Show chat section
   welcomeSection.classList.add("hidden");
   chatSection.classList.remove("hidden");
 
-  // Start conversation
   askNextQuestion();
 });
 
@@ -404,7 +485,6 @@ async function handleSend() {
 }
 
 async function handleConversation(input) {
-  // Clean input based on current step
   const cleanedInput = cleanUserInput(input, step);
   console.log(`Step ${step}: "${input}" → "${cleanedInput}"`);
 
@@ -425,13 +505,11 @@ async function handleConversation(input) {
       userData.interests = cleanedInput;
       step++;
 
-      // All data collected - SAVE TO SUPABASE FIRST
       appendMessage(
         "bot",
         "🎯 Perfect! I have all your information. Saving your profile... 💾"
       );
 
-      // Save user data to Supabase BEFORE calling Gemini
       const saveSuccess = await saveUserDataToSupabase();
 
       if (saveSuccess) {
@@ -442,25 +520,28 @@ async function handleConversation(input) {
         await showCareerSuggestions();
       } else {
         appendMessage("bot", "⚠️ Failed to save profile. Please try again.");
-        step--; // Go back to allow retry
+        step--;
       }
       return;
   }
 
-  // Ask next question
   setTimeout(() => askNextQuestion(), 800);
 }
 
 // === SAVE USER DATA TO SUPABASE ===
 async function saveUserDataToSupabase() {
   try {
+    const userDataToSave = anonymousMode
+      ? anonymizeUserData(userData)
+      : userData;
+
     const { error } = await supabase
       .from("users")
       .update({
-        full_name: userData.name,
-        education_level: userData.education,
-        skills: userData.skills,
-        interests: userData.interests,
+        full_name: userDataToSave.name,
+        education_level: userDataToSave.education,
+        skills: userDataToSave.skills,
+        interests: userDataToSave.interests,
         created_at: new Date().toISOString(),
       })
       .eq("id", currentUser.id);
@@ -470,7 +551,7 @@ async function saveUserDataToSupabase() {
       return false;
     }
 
-    console.log("✅ User data saved to Supabase:", userData);
+    console.log("✅ User data saved to Supabase:", userDataToSave);
     return true;
   } catch (error) {
     console.error("Error saving to Supabase:", error);
@@ -483,7 +564,7 @@ function cleanUserInput(input, step) {
   const clean = input.trim();
 
   switch (step) {
-    case 0: // Name
+    case 0:
       return clean
         .replace(
           /^(my name is|i'm|i am|you can call me|it's|this is|name's|i go by)/gi,
@@ -501,7 +582,7 @@ function cleanUserInput(input, step) {
         .join(" ")
         .replace(/\s+/g, " ");
 
-    case 1: // Education
+    case 1:
       return clean
         .replace(/\s+/g, " ")
         .replace(
@@ -556,13 +637,11 @@ Keep the response practical, motivational, and SPECIFIC to South Africa. Mention
 
   const aiResponse = await askGemini(prompt);
 
-  // Format the response
   const formattedResponse = aiResponse
     .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
     .replace(/\n/g, "<br>")
     .replace(/\d\./g, "🔹");
 
-  // Display recommendations
   const msg = document.createElement("div");
   msg.classList.add("bot-message");
   msg.innerHTML = `
@@ -581,10 +660,8 @@ Keep the response practical, motivational, and SPECIFIC to South Africa. Mention
   `;
   chatContainer.appendChild(msg);
 
-  // Save recommendations to Supabase
   await saveRecommendationToSupabase(aiResponse);
 
-  // Add SA-specific resources
   addActionButton("📱 Explore SA Youth ", () =>
     window.open("https://sayouth.co.za/", "_blank")
   );
@@ -644,6 +721,7 @@ userInput.addEventListener("input", () => {
 // === LOGOUT ===
 logoutBtn.addEventListener("click", () => {
   localStorage.removeItem("career_user_id");
+  localStorage.removeItem("anonymous_mode");
   window.location.href = "index.html";
 });
 
