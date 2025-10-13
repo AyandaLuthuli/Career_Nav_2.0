@@ -61,15 +61,14 @@ let userData = {
 };
 let currentUser = null;
 let anonymousMode = false;
+let recommendationsCompleted = false;
 
 // === PRIVACY ENHANCEMENTS ===
 function initializePrivacyFeatures() {
-  // Load privacy preference
   anonymousMode = localStorage.getItem("anonymous_mode") === "true";
   if (anonymousModeToggle) {
     anonymousModeToggle.checked = anonymousMode;
 
-    // Add toggle event listener
     anonymousModeToggle.addEventListener("change", function (e) {
       anonymousMode = e.target.checked;
       localStorage.setItem("anonymous_mode", anonymousMode);
@@ -84,12 +83,10 @@ function initializePrivacyFeatures() {
         );
       }
 
-      // Reload conversations to reflect privacy changes
       loadPreviousConversations();
     });
   }
 
-  // Add privacy policy section to welcome
   addPrivacyInfo();
 }
 
@@ -154,7 +151,6 @@ window.addEventListener("load", async () => {
   }
 
   try {
-    // Get user data from Supabase
     const { data: user, error } = await supabase
       .from("users")
       .select("*, logins(username)")
@@ -170,10 +166,7 @@ window.addEventListener("load", async () => {
     userData.username = user.logins?.username || user.full_name || "User";
     usernameDisplay.textContent = userData.username;
 
-    // Initialize privacy features
     initializePrivacyFeatures();
-
-    // Load previous conversations from localStorage AND Supabase
     await loadPreviousConversations();
   } catch (error) {
     console.error("Error loading user:", error);
@@ -183,12 +176,10 @@ window.addEventListener("load", async () => {
 
 // === LOAD PREVIOUS CONVERSATIONS ===
 async function loadPreviousConversations() {
-  // Only load from localStorage if not in anonymous mode
   const savedConvos = !anonymousMode
     ? localStorage.getItem(`career_conversations_${currentUser.id}`)
     : null;
 
-  // Load from Supabase for career suggestions (always load these for demo purposes)
   const { data: recommendations, error } = await supabase
     .from("recommendations")
     .select("*")
@@ -320,10 +311,18 @@ async function loadRecommendation(recommendationId) {
     `;
     chatContainer.appendChild(msg);
 
+    // After loading recommendations, enable follow-up questions
+    recommendationsCompleted = true;
+    appendMessage(
+      "bot",
+      "💬 Feel free to ask any questions about these career options!"
+    );
+
     addActionButton("🔄 Start New Assessment", () => window.location.reload());
     addActionButton("🏠 Back to Home", () => {
       welcomeSection.classList.remove("hidden");
       chatSection.classList.add("hidden");
+      recommendationsCompleted = false;
     });
   }
 }
@@ -358,6 +357,11 @@ function loadConversation(index) {
     if (step < 4) {
       askNextQuestion();
     } else {
+      recommendationsCompleted = true;
+      appendMessage(
+        "bot",
+        "💬 Feel free to ask any questions about your career options!"
+      );
       addActionButton("🔄 Start New Assessment", () =>
         window.location.reload()
       );
@@ -368,7 +372,7 @@ function loadConversation(index) {
 // === SAVE CONVERSATION TO LOCALSTORAGE ===
 function saveConversation() {
   if (anonymousMode) {
-    return; // Don't save conversations in anonymous mode
+    return;
   }
 
   const messages = Array.from(chatContainer.children)
@@ -459,12 +463,11 @@ startChatBtn.addEventListener("click", () => {
     interests: "",
     username: userData.username,
   };
+  recommendationsCompleted = false;
 
   chatContainer.innerHTML = "";
-
   welcomeSection.classList.add("hidden");
   chatSection.classList.remove("hidden");
-
   askNextQuestion();
 });
 
@@ -481,7 +484,44 @@ async function handleSend() {
   appendMessage("user", text);
   userInput.value = "";
 
-  await handleConversation(text);
+  // Check if we're in follow-up mode after recommendations
+  if (recommendationsCompleted) {
+    await handleFollowUpQuestion(text);
+  } else {
+    await handleConversation(text);
+  }
+}
+
+// === HANDLE FOLLOW-UP QUESTIONS ===
+async function handleFollowUpQuestion(question) {
+  const followUpPrompt = `
+You are continuing a career guidance conversation. Keep responses SHORT and BRIEF - maximum 3-4 sentences.
+
+USER'S PROFILE:
+- Name: ${userData.name}
+- Education: ${userData.education} 
+- Skills: ${userData.skills}
+- Interests: ${userData.interests}
+
+USER'S QUESTION: "${question}"
+
+Provide a CONCISE answer focusing on:
+- Key practical steps for South Africa
+- Most important details only
+- Keep it under 3 sentences
+
+IMPORTANT: Be direct and to the point. No long explanations.
+`;
+
+  appendMessage("bot", "🤔 Thinking...");
+  const response = await askGemini(followUpPrompt);
+
+  // Remove "Thinking..." message and show actual response
+  chatContainer.removeChild(chatContainer.lastChild);
+  appendMessage("bot", response);
+
+  // // Short follow-up prompt
+  // appendMessage("bot", "💡 Any other questions?");
 }
 
 async function handleConversation(input) {
@@ -505,22 +545,19 @@ async function handleConversation(input) {
       userData.interests = cleanedInput;
       step++;
 
-      appendMessage(
-        "bot",
-        "🎯 Perfect! I have all your information. Saving your profile... 💾"
-      );
+      appendMessage("bot", "🎯 Perfect!.Analyzing your profile ......🤔");
 
       const saveSuccess = await saveUserDataToSupabase();
 
       if (saveSuccess) {
-        appendMessage(
-          "bot",
-          "✅ Profile saved! Analyzing your profile using AI... 🤔"
-        );
+        // appendMessage(
+        //   "bot",
+        //   "✅ Profile saved! Analyzing your profile using AI... 🤔"
+        // );
         await showCareerSuggestions();
       } else {
-        appendMessage("bot", "⚠️ Failed to save profile. Please try again.");
-        step--;
+        // appendMessage("bot", "⚠️ Failed to save profile. Please try again.");
+        // step--;
       }
       return;
   }
@@ -601,7 +638,8 @@ async function showCareerSuggestions() {
   const { education, skills, interests, name } = userData;
 
   const prompt = `
-You are an AI Career Advisor specifically focused on South African youth and the local job market.
+You are an AI Career Advisor specifically focused on South African youth  and the local job market.
+refer to user as "You",first person.
 
 Based on the following profile, suggest *exactly three* realistic and in-demand opportunities in South Africa.
 
@@ -662,7 +700,14 @@ Keep the response practical, motivational, and SPECIFIC to South Africa. Mention
 
   await saveRecommendationToSupabase(aiResponse);
 
-  addActionButton("📱 Explore SA Youth ", () =>
+  // Set recommendations as completed and enable follow-up questions
+  recommendationsCompleted = true;
+  appendMessage(
+    "bot",
+    "💬 Feel free to ask any questions about these career options! I'm here to help with details, skills needed, or anything else."
+  );
+
+  addActionButton("📱 Explore SA Youth", () =>
     window.open("https://sayouth.co.za/", "_blank")
   );
   addActionButton("🎓 Find TVET Colleges", () =>
@@ -675,6 +720,7 @@ Keep the response practical, motivational, and SPECIFIC to South Africa. Mention
   addActionButton("🏠 Back to Home", () => {
     welcomeSection.classList.remove("hidden");
     chatSection.classList.add("hidden");
+    recommendationsCompleted = false;
   });
 }
 

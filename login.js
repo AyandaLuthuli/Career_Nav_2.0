@@ -80,6 +80,6 @@ signupBtn.addEventListener("click", async () => {
   }
 
   localStorage.setItem("career_user_id", newUser.id);
-  alert(`Welcome, ${username}!`);
+  // alert(`Welcome, ${username}!`);
   window.location.href = "chats.html";
 });
