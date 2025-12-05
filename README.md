@@ -1,7 +1,7 @@
 # 🎓 Career_Nav_2.0 — AI Career Navigator 🤖
 
 A web application designed to help **South African youth** discover their ideal career paths through **AI-powered conversations**.
-
+Live Demo:https://mzansipathh.netlify.app/chats.html
 ---
 
 ## 🚀 Features
