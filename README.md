@@ -1,5 +1,5 @@
-#MzansiPath 
-# 🎓 Career_Nav_2.0 — AI Career Navigator 🤖
+ 
+# 🎓 Career_Nav_2.0 — MzansiPath🤖
 
 A web application designed to help **South African youth** discover their ideal career paths through **AI-powered conversations**.
 
