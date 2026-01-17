@@ -2,7 +2,7 @@
 const SUPABASE_URL = "https://oybbsrrmggexrvkzzayf.supabase.co";
 const SUPABASE_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im95YmJzcnJtZ2dleHJ2a3p6YXlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MTEyMjQsImV4cCI6MjA3NTQ4NzIyNH0.5whFAXrEFtFICWC6SZ0pBU6-WxmLMHidBfHFKcaTlc8";
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // === ELEMENTS ===
 const loginForm = document.getElementById("loginForm");
@@ -31,7 +31,7 @@ loginBtn.addEventListener("click", async () => {
     return;
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from("logins")
     .select("*, users(*)")
     .eq("username", username)
@@ -56,7 +56,7 @@ signupBtn.addEventListener("click", async () => {
   }
 
   // Create user first
-  const { data: newUser, error: userError } = await supabase
+  const { data: newUser, error: userError } = await supabaseClient
     .from("users")
     .insert([{ full_name: username }])
     .select()
@@ -69,7 +69,7 @@ signupBtn.addEventListener("click", async () => {
   }
 
   // Then create login linked to user
-  const { error: loginError } = await supabase
+  const { error: loginError } = await supabaseClient
     .from("logins")
     .insert([{ user_id: newUser.id, username }]);
 

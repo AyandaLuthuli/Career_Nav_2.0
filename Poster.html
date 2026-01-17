@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI-Powered Career Navigation — SATNAC Poster</title>
+    <style>
+      /* A3 landscape friendly poster styling (printable) */
+      @page {
+        size: A3 landscape;
+        margin: 20mm;
+      }
+      :root {
+        --accent: #0077b6; /* Telkom-like blue */
+        --accent-2: #00b894; /* green */
+        --bg: #f7fbfc;
+        --card: #ffffff;
+        --muted: #556;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        background: linear-gradient(135deg, #e6f7ff 0%, #f7fff9 100%);
+        font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial;
+        color: #123;
+        -webkit-font-smoothing: antialiased;
+        padding: 30px;
+      }
+      .poster {
+        width: 100%;
+        height: 100%;
+        background: var(--card);
+        border-radius: 12px;
+        box-shadow: 0 8px 30px rgba(10, 10, 20, 0.08);
+        display: grid;
+        grid-template-columns: 1.2fr 1fr;
+        gap: 28px;
+        padding: 32px;
+        box-sizing: border-box;
+      }
+
+      /* Left column (content) */
+      .left {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .brand img {
+        width: 84px;
+        height: 84px;
+        object-fit: cover;
+        border-radius: 10px;
+      }
+      .brand h1 {
+        font-size: 28px;
+        margin: 0;
+        color: var(--accent);
+      }
+      .subtitle {
+        color: var(--muted);
+        margin-top: 6px;
+      }
+
+      .section {
+        background: linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.95),
+          rgba(250, 250, 250, 0.95)
+        );
+        padding: 18px;
+        border-radius: 10px;
+      }
+      .section h2 {
+        margin: 0 0 8px 0;
+        color: var(--accent);
+        font-size: 18px;
+      }
+      .section p {
+        margin: 0;
+        color: #234;
+      }
+
+      .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      .highlight {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .badge {
+        background: var(--accent);
+        color: #fff;
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-weight: 700;
+      }
+
+      /* Right column (visuals + quick facts) */
+      .right {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+      .visual {
+        flex: 1;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        border-radius: 10px;
+        color: #fff;
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .visual h3 {
+        margin: 0;
+        font-size: 20px;
+      }
+      .visual p {
+        margin: 8px 0 0 0;
+        opacity: 0.95;
+      }
+
+      .facts {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+      .fact {
+        background: #fff;
+        border-radius: 8px;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .fact strong {
+        color: var(--accent);
+        font-size: 18px;
+      }
+      .fact small {
+        color: var(--muted);
+      }
+
+      /* Footer */
+      .footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 6px;
+        border-top: 1px dashed #e6eef0;
+        margin-top: 6px;
+      }
+      .footer .left small {
+        color: #667;
+      }
+
+      /* Sponsor Section */
+      .section[style*="border-left"] {
+        background: linear-gradient(180deg, #f0faff, #f8ffff);
+      }
+
+      /* Responsive */
+      @media (max-width: 1000px) {
+        .poster {
+          grid-template-columns: 1fr;
+          padding: 18px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="poster">
+      <div class="left">
+        <div class="brand">
+          <img
+            src="https://images.unsplash.com/photo-1534723328310-e82dad3ee43f?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fGFydGlmaWNpYWwlMjBpbnRlbGxpZ2VuY2V8ZW58MHx8MHx8fDA%3D&auto=format&fit=crop&q=60&w=500"
+            alt="logo"
+          />
+          <div>
+            <h1>AI-Powered Career Navigation</h1>
+            <div class="subtitle">
+              Personalised career pathways for South African youth — SATNAC 2025
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Problem</h2>
+          <p>
+            South Africa faces over
+            <strong>60% youth unemployment</strong> among 15–24 year-olds.
+            Traditional career guidance is generic, inaccessible, and misaligned
+            with evolving labour market needs, especially in rural communities.
+          </p>
+        </div>
+
+        <div class="two-col">
+          <div class="section">
+            <h2>Objective</h2>
+            <p>
+              Deliver a web-based AI assistant that provides personalised career
+              suggestions, learning pathways, and job-matching guidance —
+              accessible via mobile and optimised for inclusivity.
+            </p>
+          </div>
+
+          <div class="section">
+            <h2>Impact</h2>
+            <p>
+              Empower youth with actionable career choices, bridge
+              education-employment gaps, and inform policy with anonymised
+              aggregate insights.
+            </p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Solution Overview</h2>
+          <p>
+            <strong>Stack:</strong> HTML/CSS/JS (frontend), Supabase (DB/auth),
+            Google Gemini (AI & NLP). The chatbot collects user profiles (name,
+            education, skills, interests), generates 3 personalised career
+            suggestions, and stores results for future sessions.
+          </p>
+        </div>
+
+        <div class="section">
+          <h2>Architecture</h2>
+          <p>
+            Frontend &rarr; Supabase (users & recommendations) &rarr; Gemini API
+            for reasoning. Hybrid model: local curated data + generative AI for
+            up-to-date suggestions.
+          </p>
+        </div>
+
+        <div class="section">
+          <h2>Timeline (4-day MVP)</h2>
+          <p>
+            <strong>Step 1:</strong> Setup & DB<br /><strong>Step 2:</strong>
+            Chat UI & basic flow<br /><strong>Step 3:</strong> Gemini
+            integration & saving<br /><strong>Step 4:</strong> Test, deploy,
+            prepare demo
+          </p>
+        </div>
+
+        <!-- 🟢 Alignment with National Goals -->
+        <div class="section">
+          <h2>Alignment with National Goals</h2>
+          <ul style="margin: 0; padding-left: 16px; color: #234">
+            <li>
+              🇿🇦 <strong>For South Africa's Future:</strong> We are actively
+              supporting the national NDP 2030 vision by equipping our youth
+              with the tools they need to become drivers of an inclusive and
+              thriving economy.
+            </li>
+            <li>
+              <strong>For Quality Education (SDG 4):</strong> We are
+              transforming career guidance from a one-time event into a
+              continuous, personalized learning journey.
+            </li>
+            <li>
+              <strong>For Economic Dignity (SDG 8):</strong> We are creating a
+              clear bridge for young people to find not just any job, but
+              meaningful and sustainable work.
+            </li>
+            <li>
+              <strong>For Digital Inclusion:</strong> We are using accessible
+              technology to ensure no young person is left behind in the journey
+              from education to employment.
+            </li>
+          </ul>
+        </div>
+
+        <!-- 🟢 Supported by Amdocs -->
+        <div class="section" style="border-left: 4px solid #0077b6">
+          <h2>Supported by Amdocs</h2>
+          <p>
+            This project is proudly supported by <strong>Amdocs</strong>, a
+            global leader in digital transformation, cloud solutions, and
+            AI-driven innovation. Amdocs empowers leading communications and
+            media companies through intelligent technologies that enhance human
+            connection. Their commitment to
+            <em
+              >digital inclusion, youth empowerment, and technology for social
+              good</em
+            >
+            aligns perfectly with our mission to guide South African youth
+            toward meaningful and future-ready careers.
+          </p>
+        </div>
+
+        <div class="footer">
+          <div class="left">
+            <small>Team: Tech Bro • Contact: ayandaalton2003@gmail.com</small>
+          </div>
+          <div class="right">
+            <small>Aligns with NDP 2030 • SDG 4 & 8</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="right">
+        <div class="visual">
+          <h3>Demo Flow</h3>
+          <p>
+            Chatbot asks short questions → collects profile → calls Gemini →
+            returns 3 tailored careers → saves history. Accessible on mobile.
+          </p>
+        </div>
+
+        <div class="facts">
+          <div class="fact">
+            <strong>60%+</strong><small>Youth unemployment (15–24)</small>
+          </div>
+          <div class="fact">
+            <strong>3</strong><small>Career suggestions per session</small>
+          </div>
+          <div class="fact">
+            <strong>Gemini</strong><small>Generative AI for reasoning</small>
+          </div>
+          <div class="fact">
+            <strong>Supabase</strong
+            ><small>Data storage & session memory</small>
+          </div>
+        </div>
+
+        <div class="section">
+          <h2>Next Steps</h2>
+          <p>
+            Multilingual support, job-api integration, course recommendations,
+            analytics dashboard for educators and policymakers.
+          </p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

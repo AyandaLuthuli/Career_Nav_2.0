@@ -3,7 +3,7 @@ const SUPABASE_URL = "https://oybbsrrmggexrvkzzayf.supabase.co";
 const SUPABASE_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im95YmJzcnJtZ2dleHJ2a3p6YXlmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MTEyMjQsImV4cCI6MjA3NTQ4NzIyNH0.5whFAXrEFtFICWC6SZ0pBU6-WxmLMHidBfHFKcaTlc8";
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // === GEMINI SETUP ===
 const GEMINI_API_KEY = "AIzaSyCMCVB5mQa6L30GymKpmqzKJ1N4M8ambNI";
@@ -18,7 +18,7 @@ async function askGemini(promptText) {
         body: JSON.stringify({
           contents: [{ parts: [{ text: promptText }] }],
         }),
-      }
+      },
     );
 
     const data = await response.json();
@@ -75,11 +75,11 @@ function initializePrivacyFeatures() {
 
       if (anonymousMode) {
         showPrivacyNotification(
-          "🔒 Anonymous mode enabled: Your personal details will not be stored"
+          "🔒 Anonymous mode enabled: Your personal details will not be stored",
         );
       } else {
         showPrivacyNotification(
-          "🔓 Anonymous mode disabled: Your data will be saved for better recommendations"
+          "🔓 Anonymous mode disabled: Your data will be saved for better recommendations",
         );
       }
 
@@ -151,7 +151,7 @@ window.addEventListener("load", async () => {
   }
 
   try {
-    const { data: user, error } = await supabase
+    const { data: user, error } = await supabaseClient
       .from("users")
       .select("*, logins(username)")
       .eq("id", savedUserId)
@@ -180,7 +180,7 @@ async function loadPreviousConversations() {
     ? localStorage.getItem(`career_conversations_${currentUser.id}`)
     : null;
 
-  const { data: recommendations, error } = await supabase
+  const { data: recommendations, error } = await supabaseClient
     .from("recommendations")
     .select("*")
     .eq("user_id", currentUser.id)
@@ -220,7 +220,7 @@ async function loadPreviousConversations() {
         <div class="conversation-item" onclick="loadConversation(${index})">
           <strong>Session ${index + 1}</strong> 
           <span class="convo-date">${new Date(
-            conv.timestamp
+            conv.timestamp,
           ).toLocaleDateString()}</span>
           <div class="convo-preview">${preview}</div>
         </div>
@@ -244,7 +244,7 @@ function extractCareerSuggestion(reasoning) {
       line.match(/^\d+\./) ||
       line.match(/^🔹/) ||
       line.includes("—") ||
-      line.match(/^[A-Z][a-z]+(\s+[A-Z][a-z]+)*\s*—/)
+      line.match(/^[A-Z][a-z]+(\s+[A-Z][a-z]+)*\s*—/),
   );
 
   if (firstCareerLine) {
@@ -269,14 +269,14 @@ async function loadRecommendation(recommendationId) {
     return;
   }
 
-  const { data: recommendation, error } = await supabase
+  const { data: recommendation, error } = await supabaseClient
     .from("recommendations")
     .select("*")
     .eq("id", recommendationId)
     .single();
 
   if (recommendation) {
-    const { data: user } = await supabase
+    const { data: user } = await supabaseClient
       .from("users")
       .select("*")
       .eq("id", currentUser.id)
@@ -297,8 +297,8 @@ async function loadRecommendation(recommendationId) {
     appendMessage(
       "bot",
       `🔍 Loading your previous career recommendations from ${new Date(
-        recommendation.created_at
-      ).toLocaleDateString()}...`
+        recommendation.created_at,
+      ).toLocaleDateString()}...`,
     );
 
     const msg = document.createElement("div");
@@ -315,7 +315,7 @@ async function loadRecommendation(recommendationId) {
     recommendationsCompleted = true;
     appendMessage(
       "bot",
-      "💬 Feel free to ask any questions about these career options!"
+      "💬 Feel free to ask any questions about these career options!",
     );
 
     addActionButton("🔄 Start New Assessment", () => window.location.reload());
@@ -335,7 +335,7 @@ function loadConversation(index) {
   }
 
   const savedConvos = localStorage.getItem(
-    `career_conversations_${currentUser.id}`
+    `career_conversations_${currentUser.id}`,
   );
   if (!savedConvos) return;
 
@@ -360,10 +360,10 @@ function loadConversation(index) {
       recommendationsCompleted = true;
       appendMessage(
         "bot",
-        "💬 Feel free to ask any questions about your career options!"
+        "💬 Feel free to ask any questions about your career options!",
       );
       addActionButton("🔄 Start New Assessment", () =>
-        window.location.reload()
+        window.location.reload(),
       );
     }
   }
@@ -379,7 +379,7 @@ function saveConversation() {
     .filter(
       (element) =>
         element.classList.contains("user-message") ||
-        element.classList.contains("bot-message")
+        element.classList.contains("bot-message"),
     )
     .map((msgElement) => ({
       sender: msgElement.classList.contains("user-message") ? "user" : "bot",
@@ -394,7 +394,7 @@ function saveConversation() {
   };
 
   const savedConvos = localStorage.getItem(
-    `career_conversations_${currentUser.id}`
+    `career_conversations_${currentUser.id}`,
   );
   let conversations = savedConvos ? JSON.parse(savedConvos) : [];
 
@@ -406,7 +406,7 @@ function saveConversation() {
 
   localStorage.setItem(
     `career_conversations_${currentUser.id}`,
-    JSON.stringify(conversations)
+    JSON.stringify(conversations),
   );
 }
 
@@ -432,13 +432,13 @@ function askNextQuestion() {
     case 0:
       appendMessage(
         "bot",
-        `👋 Hi ${userData.username}! I'm your AI Career Guide. What's your full name?`
+        `👋 Hi ${userData.username}! I'm your AI Career Guide. What's your full name?`,
       );
       break;
     case 1:
       appendMessage(
         "bot",
-        `Nice to meet you, ${userData.name}! 🎉 What's your highest education level? (e.g., High School, Diploma, Degree)`
+        `Nice to meet you, ${userData.name}! 🎉 What's your highest education level? (e.g., High School, Diploma, Degree)`,
       );
       break;
     case 2:
@@ -447,7 +447,7 @@ function askNextQuestion() {
     case 3:
       appendMessage(
         "bot",
-        "Awesome! What kind of work or industries interest you most? 💼"
+        "Awesome! What kind of work or industries interest you most? 💼",
       );
       break;
   }
@@ -572,7 +572,7 @@ async function saveUserDataToSupabase() {
       ? anonymizeUserData(userData)
       : userData;
 
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from("users")
       .update({
         full_name: userDataToSave.name,
@@ -605,7 +605,7 @@ function cleanUserInput(input, step) {
       return clean
         .replace(
           /^(my name is|i'm|i am|you can call me|it's|this is|name's|i go by)/gi,
-          ""
+          "",
         )
         .replace(/[^\sa-zA-ZÀ-ÿ-']/g, "")
         .trim()
@@ -624,7 +624,7 @@ function cleanUserInput(input, step) {
         .replace(/\s+/g, " ")
         .replace(
           /^(i have|i've completed|i completed|i finished|i have a|i hold a)/gi,
-          ""
+          "",
         )
         .trim();
 
@@ -670,7 +670,7 @@ Education: ${education}
 Skills: ${skills}
 Interests: ${interests}
 
-Keep the response practical, motivational, and SPECIFIC to South Africa. Mention real SA companies or sectors where possible.
+Keep the response practical, motivational, and SPECIFIC to South Africa. Mention real SA companies or sectors where possible.Adapt  and respond in local languge if the user uses any for example respond in Zulu .
 `;
 
   const aiResponse = await askGemini(prompt);
@@ -704,17 +704,17 @@ Keep the response practical, motivational, and SPECIFIC to South Africa. Mention
   recommendationsCompleted = true;
   appendMessage(
     "bot",
-    "💬 Feel free to ask any questions about these career options! I'm here to help with details, skills needed, or anything else."
+    "💬 Feel free to ask any questions about these career options! I'm here to help with details, skills needed, or anything else.",
   );
 
   addActionButton("📱 Explore SA Youth", () =>
-    window.open("https://sayouth.co.za/", "_blank")
+    window.open("https://sayouth.co.za/", "_blank"),
   );
   addActionButton("🎓 Find TVET Colleges", () =>
     window.open(
       "https://nationalgovernment.co.za/units/type/9/tvet-college",
-      "_blank"
-    )
+      "_blank",
+    ),
   );
   addActionButton("🔄 Start New Assessment", () => window.location.reload());
   addActionButton("🏠 Back to Home", () => {
@@ -727,7 +727,7 @@ Keep the response practical, motivational, and SPECIFIC to South Africa. Mention
 // === SAVE RECOMMENDATION TO SUPABASE ===
 async function saveRecommendationToSupabase(aiResponse) {
   try {
-    const { error } = await supabase.from("recommendations").insert([
+    const { error } = await supabaseClient.from("recommendations").insert([
       {
         user_id: currentUser.id,
         suggested_career: "Gemini AI Career Recommendations",
