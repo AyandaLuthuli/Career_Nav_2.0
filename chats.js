@@ -6,7 +6,7 @@ const SUPABASE_KEY =
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // === GEMINI SETUP ===
-const GEMINI_API_KEY = "AIzaSyCMCVB5mQa6L30GymKpmqzKJ1N4M8ambNI";
+const GEMINI_API_KEY = "AIzaSyDQeYqLwxNDG8xBuosIsIFx2ipmN9_1W3E";
 
 async function askGemini(promptText) {
   try {
